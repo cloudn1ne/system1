@@ -21,8 +21,14 @@ ENV PYTHONUNBUFFERED=1 \
 
 WORKDIR /app
 
-# curl is handy for debugging and compose healthchecks
-RUN apt-get update && apt-get install -y --no-install-recommends curl \
+# curl is handy for debugging and compose healthchecks.
+# build-essential (gcc/g++/make) is required by Triton, which torch 2.14 (cu130)
+# uses to JIT-compile CUDA kernels at runtime (e.g. the RoPE bmm_outer_product
+# op in ModernBERT). Without a compiler the forward pass crashes with
+# "Failed to find C compiler".
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        curl \
+        build-essential \
     && rm -rf /var/lib/apt/lists/*
 
 # Pin the package version for reproducibility.
