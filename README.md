@@ -41,6 +41,7 @@ The DGX Spark is an NVIDIA **arm64** workstation — build the container **on th
 One-time prereqs on the Spark:
 - Docker with the [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html) (standard on DGX)
 - `docker buildx` plugin (bundled with modern Docker)
+- **`huggingface_hub` CLI** for checkpoint downloads (`pip install -U huggingface_hub`)
 
 ```bash
 # 1. get the repo
@@ -50,9 +51,7 @@ cd system1
 # 2. download the model checkpoint(s) into ./checkpoints
 mkdir -p checkpoints
 
-#    one-time: install the HF CLI
-pip install -U huggingface_hub
-
+#    prereq: huggingface_hub CLI (see "One-time prereqs" above)
 #    pull the whole model repo (classic CLI)
 huggingface-cli download convaiinnovations/laya --local-dir checkpoints
 #    newer huggingface_hub builds accept:  hf download convaiinnovations/laya --local-dir checkpoints
