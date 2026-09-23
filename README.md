@@ -7,6 +7,7 @@ This repo hosts:
 - `Dockerfile` — CUDA-capable image for `laya-serve`
 - `docker-compose.yml` — one-command deploy with GPU passthrough, checkpoint mount, healthcheck
 - `.github/workflows/build-release.yml` — CI that builds and publishes the image on every push / version tag
+- [`SAMPLES.md`](SAMPLES.md) — SIEM log preanalysis `curl` examples against `/v1/systemone`
 
 ## Quickstart
 
