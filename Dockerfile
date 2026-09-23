@@ -31,6 +31,15 @@ ARG LAYA_VERSION=latest
 RUN pip install --no-cache-dir "laya[serve]==${LAYA_VERSION}" \
     || pip install --no-cache-dir "laya[serve]"
 
+# DGX Spark / GB10 (Blackwell sm_120) fix:
+# Some torch releases that laya pulls predate Blackwell and crash the forward
+# pass on a GB10 (SIGSEGV, no traceback -> the server returns 500). Force a
+# torch build with sm_120 + CUDA 12.8/13 support. Best-effort: if the pinned
+# laya is incompatible, the build still succeeds (falls back to its torch) and
+# you can run CPU-only via LAYA_DEVICE=cpu.
+RUN pip install --no-cache-dir --index-url https://download.pytorch.org/whl/cu128 \
+        "torch>=2.7" || true
+
 # Checkpoints live here and are mounted from the host at runtime, so weights
 # are never baked into the image and rebuilds stay small.
 RUN mkdir -p /app/checkpoints
