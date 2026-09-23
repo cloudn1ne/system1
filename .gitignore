@@ -1,5 +1,6 @@
 # model weights - mounted at runtime, never committed
-checkpoints/
+checkpoints/*
+!checkpoints/.gitkeep
 
 # python
 __pycache__/
