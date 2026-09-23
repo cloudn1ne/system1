@@ -2,7 +2,9 @@
 
 These sample `curl` calls exercise the Laya `/v1/systemone` endpoint for **SIEM log preanalysis** — triaging raw log lines *before* they hit deep analytics. Each call sends a `state` (the log line, as plain text or structured fields) plus typed `questions`, and gets back typed answers with calibrated probabilities in one forward pass.
 
-Base URL: `http://localhost:8000` (override the port with `PORT` / `make test`).
+Base URL: `http://localhost:8000` (override the port with `PORT` / `make test`). All examples pipe the response through `jq` for readable output — install it with `sudo apt-get install jq` if missing.
+
+> **Tip:** the JSON is wrapped in single quotes `-d '{...}'`, so **do not use single quotes inside the JSON string values** — use double quotes (e.g. `"whoami /priv"`) or they will terminate the argument early and you'll get `{"detail":"request body must be valid JSON"}`.
 
 ## 1. Single-question triage (is this log line suspicious?)
 
@@ -18,11 +20,14 @@ curl -s localhost:8000/v1/systemone -H 'Content-Type: application/json' -d '{
       "instructions": "Is this a sign of a brute-force or credential-stuffing attack?"
     }
   }
-}'
+}' | jq .
 ```
 
 ```json
-{"answers": {"suspicious": {"noul": 0.97}}, "routing": {"model": "english"}}
+{
+  "answers": { "suspicious": { "noul": 0.97 } },
+  "routing": { "model": "english" }
+}
 ```
 
 ## 2. Multi-question triage in one call (severity + decision)
@@ -32,7 +37,7 @@ curl -s localhost:8000/v1/systemone -H 'Content-Type: application/json' -d '{
   "state": {
     "timestamp": "2026-09-23T19:12:33Z",
     "vendor": "crowdstrike",
-    "detection": "Potential privilege escalation: svchost.exe spawned powershell.exe -enc with command line containing 'whoami /priv'."
+    "detection": "Potential privilege escalation: svchost.exe spawned powershell.exe -enc with command line containing \"whoami /priv\"."
   },
   "questions": {
     "severity": {
@@ -49,7 +54,7 @@ curl -s localhost:8000/v1/systemone -H 'Content-Type: application/json' -d '{
       "instructions": "Should this be escalated to a human analyst now?"
     }
   }
-}'
+}' | jq .
 ```
 
 ## 3. MITRE ATT&CK technique classification (choice with criteria)
@@ -74,7 +79,7 @@ curl -s localhost:8000/v1/systemone -H 'Content-Type: application/json' -d '{
       "instructions": "Should the source host be isolated automatically?"
     }
   }
-}'
+}' | jq .
 ```
 
 ## 4. Long-structured JSON event (email / phishing preanalysis)
@@ -99,7 +104,7 @@ curl -s localhost:8000/v1/systemone -H 'Content-Type: application/json' -d '{
       "criteria": ["low", "medium", "high"]
     }
   }
-}'
+}' | jq .
 ```
 
 ## 5. Using `make test` as the local smoke check
