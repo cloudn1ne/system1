@@ -34,6 +34,50 @@ Every question shape the Jev API accepts works (`criteria` as a list, etc.); unk
 
 > The CUDA **driver** must always come from the host via the toolkit; the image only carries the client-side runtime libs.
 
+## Build on the DGX Spark (native arm64)
+
+The DGX Spark is an NVIDIA **arm64** workstation — build the container **on the device, natively**. Native builds pull the prebuilt `aarch64` wheels (torch, CUDA runtime), so there is *no compilation* under emulation.
+
+One-time prereqs on the Spark:
+- Docker with the [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html) (standard on DGX)
+- `docker buildx` plugin (bundled with modern Docker)
+
+```bash
+# 1. get the repo
+ git clone ssh://git@git.sec.xbcnet.at:2223/xbcs-sec-tools/system1.git
+cd system1
+
+# 2. put model checkpoints here (mounted at runtime, never baked in)
+mkdir -p checkpoints
+#    download the checkpoint(s) you serve from the HF repo into ./checkpoints
+
+# 3. build natively (arm64, no emulation)
+make build            # == docker compose build
+#    or pin a release:  make build-pinned VERSION=0.3.11
+
+# 4. run with GPU passthrough
+make up               # == docker compose up -d
+docker compose ps
+
+# 5. verify (Jev-compatible endpoint)
+curl -s localhost:8000/v1/systemone -H 'Content-Type: application/json' -d '{
+  "state": {"document": "I was charged twice. Please fix this ASAP."},
+  "questions": {"billing": {"type": "noul", "instructions": "Is this ticket about billing?"}}
+}'
+```
+
+### Publishing the image from the Spark
+
+```bash
+# CI path (recommended): tag the git repo -> CI builds amd64+arm64 and publishes
+make release VERSION=0.1.0          # git tag v0.1.0 && git push origin v0.1.0
+
+# Registry path: tag + push the local image yourself
+make push REGISTRY=harbor.sec.xbcnet.at/system1 VERSION=0.1.0
+```
+
+To run a CI-published image on the Spark (or anywhere): `docker pull`. The multi-arch manifest auto-selects `linux/arm64` on the Spark and `linux/amd64` elsewhere.
+
 ## Configuration
 
 | env | default | purpose |
@@ -51,6 +95,7 @@ Every question shape the Jev API accepts works (`criteria` as a list, etc.); unk
 - **push to `main`** → builds and publishes `latest` (plus a `sha-*` tag)
 - **push a version tag `vX.Y.Z`** → publishes a release image tagged `vX.Y.Z`
 - PRs build (without pushing) as a gate
+- produces **multi-arch** manifests (`linux/amd64` + `linux/arm64`) via buildx + QEMU, so the same release image runs on the DGX Spark (`arm64`) and amd64 hosts
 
 By default the image is published to **GHCR** as `ghcr.io/<org>/<repo>` using the `GITHUB_TOKEN`. To publish to your own registry (e.g. Harbor on `git.sec.xbcnet.at`) instead:
 

@@ -1,6 +1,9 @@
 # docker compose up -d   (GPU host, NVIDIA Container Toolkit)
 # docker compose up -d   (CPU host: set LAYA_DEVICE=cpu and remove the GPU deploy block)
 #
+# DGX Spark (arm64): `docker compose build` builds natively on-device.
+# Use `make build` / `make up` from the repo root.
+#
 # Required env (put in a .env file or export):
 #   LAYA_API_KEY=your-secret        # optional; enables Authorization: Bearer <key>
 #

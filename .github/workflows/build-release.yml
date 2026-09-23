@@ -29,6 +29,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Cross-arch: DGX Spark is arm64; CI runners are amd64. QEMU lets buildx
+      # emit linux/arm64 manifests from an amd64 runner (torch ships prebuilt
+      # aarch64 wheels, so this is download-heavy, not compile-heavy).
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: linux/arm64
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -54,6 +62,8 @@ jobs:
         with:
           context: .
           push: ${{ github.event_name != 'pull_request' }}
+          # amd64 for CI/other hosts; arm64 for the DGX Spark
+          platforms: linux/amd64,linux/arm64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
