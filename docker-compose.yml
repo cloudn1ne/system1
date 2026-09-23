@@ -1,0 +1,45 @@
+# docker compose up -d   (GPU host, NVIDIA Container Toolkit)
+# docker compose up -d   (CPU host: set LAYA_DEVICE=cpu and remove the GPU deploy block)
+#
+# Required env (put in a .env file or export):
+#   LAYA_API_KEY=your-secret        # optional; enables Authorization: Bearer <key>
+#
+# Optional env:
+#   LAYA_DEVICE=cuda|cpu            # default cuda
+#   LAYA_PRELOAD=1                  # default 1: preload checkpoints at boot
+#   LAYA_PORT=8000                  # host port (default 8000)
+version: "3.9"
+
+services:
+  laya:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        LAYA_VERSION: ${LAYA_VERSION:-latest}
+    image: laya-serve
+    container_name: laya
+    ports:
+      - "${LAYA_PORT:-8000}:8000"
+    environment:
+      LAYA_DEVICE: ${LAYA_DEVICE:-cuda}
+      LAYA_PRELOAD: ${LAYA_PRELOAD:-1}
+      LAYA_API_KEY: ${LAYA_API_KEY:-}
+    volumes:
+      # Mount the model checkpoints dir so weights are never baked into the image.
+      - ./checkpoints:/app/checkpoints
+    # GPU passthrough (Docker Compose v2 spec). Requires NVIDIA Container Toolkit.
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [ gpu ]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket; s=socket.socket(); s.connect(('localhost',8000)); s.close()"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 180s
+    restart: unless-stopped

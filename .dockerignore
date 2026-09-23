@@ -1,0 +1,6 @@
+.git
+.github
+checkpoints/
+*.md
+docker-compose.yml
+.env

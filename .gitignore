@@ -1,0 +1,14 @@
+# model weights - mounted at runtime, never committed
+checkpoints/
+
+# python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# misc
+.DS_Store
+*.log
+.env
