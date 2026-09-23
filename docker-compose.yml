@@ -10,7 +10,7 @@
 # Optional env:
 #   LAYA_DEVICE=cuda|cpu            # default cuda
 #   LAYA_PRELOAD=1                  # default 1: preload checkpoints at boot
-#   LAYA_PORT=8000                  # host port (default 8000)
+#   LAYA_PORT=8003                  # host port (default 8003)
 #   HF_TOKEN=hf_xxx                # optional: higher rate limits, faster HF downloads
 
 services:
@@ -23,7 +23,7 @@ services:
     image: laya-serve
     container_name: laya
     ports:
-      - "${LAYA_PORT:-8000}:8000"
+      - "${LAYA_PORT:-8003}:8000"
     environment:
       LAYA_DEVICE: ${LAYA_DEVICE:-cuda}
       LAYA_PRELOAD: ${LAYA_PRELOAD:-1}

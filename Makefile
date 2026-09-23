@@ -3,8 +3,8 @@
 # The DGX Spark is arm64: always build natively on the device (`make build`),
 # never cross-build from an amd64 machine for the Spark.
 
-# Host port for the smoke test (override: make test PORT=8001)
-PORT ?= 8000
+# Host port for the smoke test (override: make test PORT=8003)
+PORT ?= 8003
 
 .PHONY: build build-pinned up down logs ps test push release tag
 
@@ -26,7 +26,7 @@ logs: ## Follow container logs
 ps: ## Container status
 	docker compose ps
 
-# Smoke-test the running server (default port 8000, override with PORT=...)
+# Smoke-test the running server (default port 8003, override with PORT=...)
 test: ## Curl /v1/systemone against localhost
 	@curl -fsS localhost:$(PORT)/v1/systemone -H 'Content-Type: application/json' -d '{"state": {"document": "I was charged twice. Please fix this ASAP."}, "questions": {"billing": {"type": "noul", "instructions": "Is this ticket about billing?"}}}' ; echo
 

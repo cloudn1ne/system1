@@ -2,14 +2,14 @@
 
 These sample `curl` calls exercise the Laya `/v1/systemone` endpoint for **SIEM log preanalysis** — triaging raw log lines *before* they hit deep analytics. Each call sends a `state` (the log line, as plain text or structured fields) plus typed `questions`, and gets back typed answers with calibrated probabilities in one forward pass.
 
-Base URL: `http://localhost:8000` (override the port with `PORT` / `make test`). All examples pipe the response through `jq` for readable output — install it with `sudo apt-get install jq` if missing.
+Base URL: `http://localhost:8003` (override the port with `PORT` / `make test`). All examples pipe the response through `jq` for readable output — install it with `sudo apt-get install jq` if missing.
 
 > **Tip:** the JSON is wrapped in single quotes `-d '{...}'`, so **do not use single quotes inside the JSON string values** — use double quotes (e.g. `"whoami /priv"`) or they will terminate the argument early and you'll get `{"detail":"request body must be valid JSON"}`.
 
 ## 1. Single-question triage (is this log line suspicious?)
 
 ```bash
-curl -s localhost:8000/v1/systemone -H 'Content-Type: application/json' -d '{
+curl -s localhost:8003/v1/systemone -H 'Content-Type: application/json' -d '{
   "state": {
     "source": "windows.eventlog/4625",
     "message": "An account failed to log on. Subject: USER1. Logon type 3. Source: 10.20.1.44. 14 failed attempts in the last 2 minutes."
@@ -33,7 +33,7 @@ curl -s localhost:8000/v1/systemone -H 'Content-Type: application/json' -d '{
 ## 2. Multi-question triage in one call (severity + decision)
 
 ```bash
-curl -s localhost:8000/v1/systemone -H 'Content-Type: application/json' -d '{
+curl -s localhost:8003/v1/systemone -H 'Content-Type: application/json' -d '{
   "state": {
     "timestamp": "2026-09-23T19:12:33Z",
     "vendor": "crowdstrike",
@@ -60,7 +60,7 @@ curl -s localhost:8000/v1/systemone -H 'Content-Type: application/json' -d '{
 ## 3. MITRE ATT&CK technique classification (choice with criteria)
 
 ```bash
-curl -s localhost:8000/v1/systemone -H 'Content-Type: application/json' -d '{
+curl -s localhost:8003/v1/systemone -H 'Content-Type: application/json' -d '{
   "state": "FIREWALL: blocked outbound connection from 10.30.2.7 to 185.220.101.44:4444 (TLS). Repeated every 5s for 10 minutes. Destination is on a known blocklist.",
   "questions": {
     "category": {
@@ -85,7 +85,7 @@ curl -s localhost:8000/v1/systemone -H 'Content-Type: application/json' -d '{
 ## 4. Long-structured JSON event (email / phishing preanalysis)
 
 ```bash
-curl -s localhost:8000/v1/systemone -H 'Content-Type: application/json' -d '{
+curl -s localhost:8003/v1/systemone -H 'Content-Type: application/json' -d '{
   "state": {
     "from": "invoice@external-notice-2.top",
     "subject": "URGENT: your invoice is overdue",
@@ -110,8 +110,8 @@ curl -s localhost:8000/v1/systemone -H 'Content-Type: application/json' -d '{
 ## 5. Using `make test` as the local smoke check
 
 ```bash
-make test          # hits localhost:8000 with a simple triage sample
-make test PORT=8001
+make test          # hits localhost:8003 with a simple triage sample
+make test PORT=8003
 ```
 
 ## Notes

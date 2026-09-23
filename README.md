@@ -20,7 +20,7 @@ mkdir -p checkpoints
 docker compose up -d
 
 # 3. Query (Jev-compatible)
-curl -s localhost:8000/v1/systemone -H 'Content-Type: application/json' -d '{
+curl -s localhost:8003/v1/systemone -H 'Content-Type: application/json' -d '{
   "state": {"document": "I was charged twice. Please fix this ASAP."},
   "questions": {"billing": {"type": "noul", "instructions": "Is this ticket about billing?"}}
 }'
@@ -69,7 +69,7 @@ make up               # == docker compose up -d
 docker compose ps
 
 # 5. verify (Jev-compatible endpoint)
-curl -s localhost:8000/v1/systemone -H 'Content-Type: application/json' -d '{
+curl -s localhost:8003/v1/systemone -H 'Content-Type: application/json' -d '{
   "state": {"document": "I was charged twice. Please fix this ASAP."},
   "questions": {"billing": {"type": "noul", "instructions": "Is this ticket about billing?"}}
 }'
@@ -94,7 +94,7 @@ To run a CI-published image on the Spark (or anywhere): `docker pull`. The multi
 | `LAYA_DEVICE` | `cuda` | compute device (`cuda` / `cpu`) |
 | `LAYA_PRELOAD` | `1` | preload checkpoints at boot for sub-35 ms routing |
 | `LAYA_API_KEY` | empty | enable `Bearer` auth |
-| `LAYA_PORT` | `8000` | host port |
+| `LAYA_PORT` | `8003` | host port |
 | `LAYA_VERSION` | `latest` | pin the installed PyPI release (compose build arg) |
 
 ## Build / release pipeline
