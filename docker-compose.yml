@@ -32,6 +32,9 @@ services:
     volumes:
       # Mount the model checkpoints dir so weights are never baked into the image.
       - ./checkpoints:/app/checkpoints
+      # Persist the HuggingFace cache so checkpoints are NOT re-downloaded on
+      # every fresh container start (saves ~1-2 min per boot).
+      - hf-cache:/root/.cache/huggingface
     # GPU passthrough (Docker Compose v2 spec). Requires NVIDIA Container Toolkit.
     deploy:
       resources:
@@ -47,3 +50,7 @@ services:
       retries: 3
       start_period: 180s
     restart: unless-stopped
+
+# Named volumes (persist across container recreates).
+volumes:
+  hf-cache:
