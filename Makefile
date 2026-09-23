@@ -3,7 +3,10 @@
 # The DGX Spark is arm64: always build natively on the device (`make build`),
 # never cross-build from an amd64 machine for the Spark.
 
-.PHONY: build build-pinned up down logs ps push release tag
+# Host port for the smoke test (override: make test PORT=8001)
+PORT ?= 8000
+
+.PHONY: build build-pinned up down logs ps test push release tag
 
 build: ## Build the image natively on the DGX Spark (arm64, no emulation)
 	docker compose build
@@ -22,6 +25,10 @@ logs: ## Follow container logs
 
 ps: ## Container status
 	docker compose ps
+
+# Smoke-test the running server (default port 8000, override with PORT=...)
+test: ## Curl /v1/systemone against localhost
+	@curl -fsS localhost:$(PORT)/v1/systemone -H 'Content-Type: application/json' -d '{"state": {"document": "I was charged twice. Please fix this ASAP."}, "questions": {"billing": {"type": "noul", "instructions": "Is this ticket about billing?"}}}' ; echo
 
 # Publish the locally-built image to your registry (default GHCR).
 #   make push REGISTRY=ghcr.io/cloudn1ne/system1 VERSION=0.1.0
