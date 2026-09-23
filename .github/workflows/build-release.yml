@@ -2,9 +2,9 @@
 # version tag (vX.Y.Z). Tag pushes produce a release image tagged with the
 # version; main pushes produce a `latest` image.
 #
-# The image is pushed to GitHub Container Registry (GHCR). To instead publish
-# to your own registry (e.g. Harbor on git.sec.xbcnet.at), change REGISTRY and
-# the login secret accordingly - see README.
+# The image is pushed to GitHub Container Registry (GHCR) as ghcr.io/cloudn1ne/system1
+# using the auto-provided GITHUB_TOKEN. To publish to a different registry instead,
+# change REGISTRY and the login secrets accordingly - see README.
 name: build-release
 
 on:

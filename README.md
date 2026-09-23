@@ -44,7 +44,7 @@ One-time prereqs on the Spark:
 
 ```bash
 # 1. get the repo
- git clone ssh://git@git.sec.xbcnet.at:2223/xbcs-sec-tools/system1.git
+git clone git@github.com:cloudn1ne/system1.git
 cd system1
 
 # 2. put model checkpoints here (mounted at runtime, never baked in)
@@ -73,7 +73,7 @@ curl -s localhost:8000/v1/systemone -H 'Content-Type: application/json' -d '{
 make release VERSION=0.1.0          # git tag v0.1.0 && git push origin v0.1.0
 
 # Registry path: tag + push the local image yourself
-make push REGISTRY=harbor.sec.xbcnet.at/system1 VERSION=0.1.0
+make push REGISTRY=ghcr.io/cloudn1ne/system1 VERSION=0.1.0
 ```
 
 To run a CI-published image on the Spark (or anywhere): `docker pull`. The multi-arch manifest auto-selects `linux/arm64` on the Spark and `linux/amd64` elsewhere.
@@ -97,15 +97,7 @@ To run a CI-published image on the Spark (or anywhere): `docker pull`. The multi
 - PRs build (without pushing) as a gate
 - produces **multi-arch** manifests (`linux/amd64` + `linux/arm64`) via buildx + QEMU, so the same release image runs on the DGX Spark (`arm64`) and amd64 hosts
 
-By default the image is published to **GHCR** as `ghcr.io/<org>/<repo>` using the `GITHUB_TOKEN`. To publish to your own registry (e.g. Harbor on `git.sec.xbcnet.at`) instead:
-
-```yaml
-env:
-  REGISTRY: harbor.sec.xbcnet.at
-  IMAGE_NAME: system1/laya
-# and change the login step to use your registry + secret
-#   secrets: REGISTRY_TOKEN
-```
+By default the image is published to **GHCR** as `ghcr.io/cloudn1ne/system1` using the auto-provided `GITHUB_TOKEN` (no secrets to configure on GitHub). To publish to your own registry instead:
 
 ## Layout
 

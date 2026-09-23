@@ -23,8 +23,8 @@ logs: ## Follow container logs
 ps: ## Container status
 	docker compose ps
 
-# Publish the locally-built image to your registry.
-#   make push REGISTRY=harbor.sec.xbcnet.at/system1 VERSION=0.1.0
+# Publish the locally-built image to your registry (default GHCR).
+#   make push REGISTRY=ghcr.io/cloudn1ne/system1 VERSION=0.1.0
 push: ## docker tag + push the local image to REGISTRY
 	docker tag laya-serve $(REGISTRY):$(VERSION)
 	docker push $(REGISTRY):$(VERSION)
