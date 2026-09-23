@@ -47,9 +47,18 @@ One-time prereqs on the Spark:
 git clone git@github.com:cloudn1ne/system1.git
 cd system1
 
-# 2. put model checkpoints here (mounted at runtime, never baked in)
+# 2. download the model checkpoint(s) into ./checkpoints
 mkdir -p checkpoints
-#    download the checkpoint(s) you serve from the HF repo into ./checkpoints
+
+#    one-time: install the HF CLI
+pip install -U huggingface_hub
+
+#    pull the whole model repo (classic CLI)
+huggingface-cli download convaiinnovations/laya --local-dir checkpoints
+#    newer huggingface_hub builds accept:  hf download convaiinnovations/laya --local-dir checkpoints
+
+#    (optional) pull only the weights you serve, e.g.
+#    huggingface-cli download convaiinnovations/laya --local-dir checkpoints --include "*.safetensors"
 
 # 3. build natively (arm64, no emulation)
 make build            # == docker compose build
